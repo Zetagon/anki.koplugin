@@ -111,11 +111,14 @@ function AnkiConnect:sync_offline_notes()
         local modifiers = note.params.note._modifiers
         local mod_error = nil
         for param, mod in pairs(modifiers) do
-            local _, ok, result_or_err = pcall(self[mod.func], self, unpack(mod.args))
-            if not ok then
-                mod_error = result_or_err
-                errs[mod_error] = errs[mod_error] + 1
-                break
+            if self.conf.use_forvo:get_value() or param ~= "audio" then
+                local _, ok, result_or_err = pcall(self[mod.func], self, unpack(mod.args))
+                if not ok then
+                    mod_error = result_or_err
+                    errs[mod_error] = errs[mod_error] + 1
+                    break
+                end
+                note.params.note[param] = result_or_err
             end
             note.params.note[param] = result_or_err
         end
@@ -232,11 +235,13 @@ function AnkiConnect:add_note(anki_note)
         })
     end
     for param, mod in pairs(note.params.note._modifiers) do
-        local _, ok, result_or_err = pcall(self[mod.func], self, unpack(mod.args))
-        if not ok then
-            return self:store_offline(note, result_or_err)
+        if self.conf.use_forvo:get_value() or param ~= "audio" then
+            local _, ok, result_or_err = pcall(self[mod.func], self, unpack(mod.args))
+            if not ok then
+                return self:store_offline(note, result_or_err)
+            end
+            note.params.note[param] = result_or_err
         end
-        note.params.note[param] = result_or_err
     end
     note.params.note._modifiers = nil
 

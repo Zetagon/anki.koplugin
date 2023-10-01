@@ -49,6 +49,8 @@ local Config = {
     p_a_field = "VocabPitchPattern",
 
     -- The plugin can query Forvo for audio of the word you just looked up.
+    -- Set to false to disable Forvo
+    use_forvo = true,
     -- The field name where the audio will be sent to.
     audio_field = "VocabAudio",
 
