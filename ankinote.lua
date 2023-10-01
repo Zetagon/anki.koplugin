@@ -316,10 +316,6 @@ function AnkiNote:build()
     local note = {
         -- The caller is responsible to fill in potential audio/image fields
         -- the _modifiers table contains info on how to populate them
-        _modifiers = {
-            audio = { func = "set_forvo_audio", args = { word, self:get_language() } },
-            picture = { func = "set_image_data", args = { self:get_picture_context() } },
-        },
         deckName = self.deckName:get_value(),
         modelName = self.modelName:get_value(),
         fields = fields,
@@ -329,6 +325,12 @@ function AnkiNote:build()
         },
         tags = self.tags,
     }
+
+    note._modifiers = {}
+    if self.conf.use_forvo:get_value() then
+        note._modifiers.audio = { func = "set_forvo_audio", args = { word, self:get_language() } }
+    end
+    note._modifiers.picture = { func = "set_image_data", args = { self:get_picture_context() } }
     return { action = "addNote", params = { note = note }, version = 6 }
 end
 
